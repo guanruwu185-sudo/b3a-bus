@@ -5,26 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>B3A 實時到站 · 山景邨 ↔ 深圳灣口岸</title>
 <meta name="description" content="城巴 B3A 實時到站預報。嶺南大學附近的富泰邨／富泰商場站，手機適用。">
-<meta name="theme-color" content="#070d18">
+<meta name="theme-color" content="#050914">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffb100'/%3E%3Ctext x='32' y='42' font-family='Arial,sans-serif' font-size='23' font-weight='700' text-anchor='middle' fill='%23070d18'%3EB3A%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237cd6ff'/%3E%3Ctext x='32' y='42' font-family='Arial,sans-serif' font-size='23' font-weight='700' text-anchor='middle' fill='%23061321'%3EB3A%3C/text%3E%3C/svg%3E">
 <style>
   :root{
     color-scheme: dark;
-    --bg: #070d18;
-    --bg-soft: #0a1322;
-    --card: #101c31;
-    --card-hi: #15243d;
-    --line: rgba(255,255,255,.08);
-    --line-strong: rgba(255,255,255,.14);
-    --text: #f2f6ff;
-    --muted: #8ea2c0;
-    --muted-2: #7e93b3;
-    --amber: #ffb100;
-    --amber-2: #ffd257;
-    --amber-deep: #ff8a00;
-    --green: #3ddc84;
+    --bg: #050914;
+    --bg-soft: #08101f;
+    --card: #0b1628;
+    --card-hi: #12233d;
+    --line: rgba(150,205,255,.10);
+    --line-strong: rgba(160,215,255,.18);
+    --text: #eef6ff;
+    --muted: #93aac8;
+    --muted-2: #7d97bc;
+    --accent: #5ec8ff;
+    --accent-2: #bdeaff;
+    --accent-deep: #8b7bff;
+    --violet: #9a86ff;
+    --green: #43e0b0;
     --red: #ff6b6b;
     --radius: 22px;
     --shadow: 0 24px 60px -28px rgba(0,0,0,.9);
@@ -39,8 +40,8 @@
     margin: 0;
     min-height: 100svh;
     background:
-      radial-gradient(120% 55% at 50% -8%, rgba(255,177,0,.12), transparent 62%),
-      radial-gradient(90% 45% at 105% 38%, rgba(45,110,220,.10), transparent 60%),
+      radial-gradient(120% 55% at 50% -8%, rgba(94,200,255,.12), transparent 62%),
+      radial-gradient(90% 45% at 105% 38%, rgba(154,134,255,.12), transparent 60%),
       var(--bg);
     color: var(--text);
     font-family: "PingFang HK", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -53,7 +54,7 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     height: 3px;
-    background: linear-gradient(90deg, var(--amber-deep), var(--amber-2), var(--amber-deep));
+    background: linear-gradient(90deg, var(--accent-deep), var(--accent-2), var(--accent-deep));
     z-index: 20;
   }
 
@@ -80,24 +81,37 @@
     width: 56px; height: 56px;
     display: grid; place-items: center;
     border-radius: 17px;
-    background: linear-gradient(160deg, #ffd257 0%, #ffb100 55%, #ff9500 100%);
-    color: #14100a;
+    background: linear-gradient(160deg, #bdeaff 0%, #5ec8ff 55%, #5e9cff 100%);
+    color: #061321;
     font-size: 19px;
     font-weight: 800;
     letter-spacing: -.03em;
-    box-shadow: 0 10px 26px -10px rgba(255,177,0,.65), inset 0 1px 0 rgba(255,255,255,.45);
+    box-shadow: 0 10px 26px -10px rgba(94,200,255,.65), inset 0 1px 0 rgba(255,255,255,.45);
   }
 
   .titles{ flex: 1; min-width: 0; }
 
   .kicker{
+    display: flex;
+    align-items: center;
+    gap: 6px;
     margin: 0 0 3px;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: .16em;
     text-transform: uppercase;
-    color: var(--amber-2);
+    color: var(--accent-2);
   }
+
+  .hat-mark{
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+    color: var(--accent-2);
+    opacity: 1;
+  }
+
+  .hat-mark svg{ display: block; width: 100%; height: 100%; }
 
   h1{
     margin: 0;
@@ -107,6 +121,8 @@
     line-height: 1.3;
     overflow-wrap: anywhere;
   }
+
+  .nowrap{ white-space: nowrap; }
 
   .live{
     flex: 0 0 auto;
@@ -119,8 +135,8 @@
     font-weight: 800;
     letter-spacing: .13em;
     color: var(--green);
-    background: rgba(61,220,132,.10);
-    border: 1px solid rgba(61,220,132,.28);
+    background: rgba(67,224,176,.10);
+    border: 1px solid rgba(67,224,176,.28);
   }
 
   .live .dot{
@@ -131,9 +147,9 @@
   }
 
   .live[data-status="stale"]{
-    color: var(--amber-2);
-    background: rgba(255,177,0,.10);
-    border-color: rgba(255,177,0,.30);
+    color: var(--accent-2);
+    background: rgba(94,200,255,.10);
+    border-color: rgba(94,200,255,.30);
   }
 
   .live[data-status="error"]{
@@ -143,9 +159,9 @@
   }
 
   @keyframes pulse{
-    0%{ box-shadow: 0 0 0 0 rgba(61,220,132,.55); }
-    70%{ box-shadow: 0 0 0 7px rgba(61,220,132,0); }
-    100%{ box-shadow: 0 0 0 0 rgba(61,220,132,0); }
+    0%{ box-shadow: 0 0 0 0 rgba(67,224,176,.55); }
+    70%{ box-shadow: 0 0 0 7px rgba(67,224,176,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(67,224,176,0); }
   }
 
   /* ---------- direction tabs ---------- */
@@ -177,9 +193,9 @@
   .tabs button:active{ transform: scale(.985); }
 
   .tabs button[aria-selected="true"]{
-    background: linear-gradient(180deg, #ffc733, #ffb100);
-    color: #171104;
-    box-shadow: 0 10px 22px -12px rgba(255,177,0,.9), inset 0 1px 0 rgba(255,255,255,.4);
+    background: linear-gradient(180deg, #a8e3ff, #5ec8ff);
+    color: #061321;
+    box-shadow: 0 10px 22px -12px rgba(94,200,255,.9), inset 0 1px 0 rgba(255,255,255,.4);
   }
 
   .tab-zh{ font-size: 14.5px; font-weight: 750; letter-spacing: -.01em; }
@@ -223,7 +239,7 @@
   }
 
   .picker select:focus{ outline: none; }
-  .picker:focus-within{ border-color: rgba(255,177,0,.55); box-shadow: 0 0 0 3px rgba(255,177,0,.12); }
+  .picker:focus-within{ border-color: rgba(94,200,255,.55); box-shadow: 0 0 0 3px rgba(94,200,255,.12); }
   .picker option{ background: #0c1626; color: var(--text); }
 
   .picker-chevron{
@@ -271,11 +287,31 @@
     margin-top: 12px;
     padding: 21px 20px 14px;
     border-radius: var(--radius);
-    background: linear-gradient(180deg, rgba(23,38,63,.94), rgba(13,23,40,.96));
+    background: linear-gradient(180deg, rgba(18,34,61,.94), rgba(9,18,34,.96));
     border: 1px solid var(--line-strong);
     box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.06);
     overflow: hidden;
     scroll-margin-top: 16px;
+  }
+
+  .board > *{ position: relative; z-index: 1; }
+
+  .board::before{
+    content: "";
+    position: absolute;
+    right: -70px; bottom: -100px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle,
+        transparent 0 36%,
+        rgba(94,200,255,.10) 37% 38%,
+        transparent 39% 55%,
+        rgba(154,134,255,.08) 56% 57%,
+        transparent 58% 72%,
+        rgba(94,200,255,.06) 73% 74%,
+        transparent 75%);
+    pointer-events: none;
   }
 
   .board::after{
@@ -283,7 +319,7 @@
     position: absolute;
     top: -110px; right: -90px;
     width: 260px; height: 260px;
-    background: radial-gradient(circle, rgba(255,177,0,.14), transparent 68%);
+    background: radial-gradient(circle, rgba(94,200,255,.14), transparent 68%);
     pointer-events: none;
   }
 
@@ -301,7 +337,7 @@
     font-size: 9.5px;
     font-weight: 800;
     letter-spacing: .17em;
-    color: var(--amber-2);
+    color: var(--accent-2);
     text-transform: uppercase;
   }
 
@@ -323,9 +359,9 @@
     font-size: 10px;
     font-weight: 700;
     letter-spacing: .02em;
-    color: var(--amber-2);
-    background: rgba(255,177,0,.12);
-    border: 1px solid rgba(255,177,0,.30);
+    color: var(--accent-2);
+    background: rgba(94,200,255,.12);
+    border: 1px solid rgba(94,200,255,.30);
   }
 
   .stop-sub{
@@ -349,11 +385,11 @@
     transition: color .18s ease, border-color .18s ease, transform .18s ease;
   }
 
-  .refresh:hover{ color: var(--text); border-color: rgba(255,177,0,.45); }
+  .refresh:hover{ color: var(--text); border-color: rgba(94,200,255,.45); }
   .refresh:active{ transform: scale(.94); }
   .refresh svg{ width: 18px; height: 18px; }
   .refresh.is-loading svg{ animation: spin .9s linear infinite; }
-  .refresh.is-loading{ color: var(--amber-2); border-color: rgba(255,177,0,.4); }
+  .refresh.is-loading{ color: var(--accent-2); border-color: rgba(94,200,255,.4); }
 
   @keyframes spin{ to{ transform: rotate(360deg); } }
 
@@ -366,17 +402,36 @@
     min-height: 74px;
   }
 
+  .spark{
+    position: absolute;
+    display: block;
+    background: linear-gradient(180deg, #e0f7ff, #7cd6ff);
+    clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+    opacity: .55;
+    pointer-events: none;
+    animation: twinkle 3.8s ease-in-out infinite;
+  }
+
+  .spark.s1{ width: 10px; height: 10px; right: 12px; top: 4px; }
+  .spark.s2{ width: 6px; height: 6px; right: 46px; top: 44px; animation-delay: -1.4s; }
+  .spark.s3{ width: 5px; height: 5px; right: 4px; top: 62px; animation-delay: -2.6s; }
+
+  @keyframes twinkle{
+    0%, 100%{ opacity: .18; transform: scale(.8) rotate(0deg); }
+    50%{ opacity: .85; transform: scale(1) rotate(18deg); }
+  }
+
   .num{
     font-size: clamp(66px, 19vw, 92px);
     font-weight: 800;
     line-height: .86;
     letter-spacing: -.055em;
     font-variant-numeric: tabular-nums;
-    background: linear-gradient(180deg, #ffe6a1 0%, #ffc02e 52%, #ff9200 100%);
+    background: linear-gradient(180deg, #e0f7ff 0%, #7cd6ff 52%, #8e7bff 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    filter: drop-shadow(0 0 26px rgba(255,177,0,.20));
+    filter: drop-shadow(0 0 26px rgba(94,200,255,.20));
   }
 
   .num.soon{
@@ -399,7 +454,7 @@
     font-size: 17px;
     font-weight: 750;
     letter-spacing: .02em;
-    color: var(--amber-2);
+    color: var(--accent-2);
   }
 
   .num.soon + .unit{ padding-bottom: 10px; }
@@ -445,8 +500,8 @@
   }
 
   .eta-list li:first-child .idx{
-    background: rgba(255,177,0,.14);
-    color: var(--amber-2);
+    background: rgba(94,200,255,.14);
+    color: var(--accent-2);
   }
 
   .eta-time{
@@ -477,8 +532,8 @@
   }
 
   .eta-list li:first-child .eta-tag{
-    color: #171104;
-    background: var(--amber-2);
+    color: #061321;
+    background: var(--accent-2);
     border-color: transparent;
   }
 
@@ -515,7 +570,7 @@
   .auto-dot{
     width: 5px; height: 5px;
     border-radius: 50%;
-    background: var(--amber);
+    background: var(--accent);
   }
 
   /* ---------- stops ---------- */
@@ -573,8 +628,8 @@
   .stop-item:hover{ background: rgba(255,255,255,.04); }
 
   .stop-item.is-selected{
-    background: rgba(255,177,0,.10);
-    box-shadow: inset 3px 0 0 var(--amber);
+    background: rgba(94,200,255,.10);
+    box-shadow: inset 3px 0 0 var(--accent);
   }
 
   .stop-marker{
@@ -595,8 +650,8 @@
   }
 
   .stop-item.is-selected .node{
-    background: var(--amber);
-    box-shadow: 0 0 0 1px var(--amber), 0 0 12px rgba(255,177,0,.55);
+    background: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 0 12px rgba(94,200,255,.55);
   }
 
   .stop-marker::after{
@@ -638,8 +693,8 @@
     font-size: 9px;
     font-weight: 750;
     letter-spacing: .06em;
-    color: var(--amber-2);
-    border: 1px solid rgba(255,177,0,.35);
+    color: var(--accent-2);
+    border: 1px solid rgba(94,200,255,.35);
     border-radius: 999px;
     padding: 3px 6px;
   }
@@ -684,7 +739,7 @@
     left: 0; top: .62em;
     width: 5px; height: 5px;
     border-radius: 50%;
-    background: var(--amber);
+    background: var(--accent);
     opacity: .8;
   }
 
@@ -724,8 +779,17 @@
   <header class="top">
     <div class="route-badge" aria-hidden="true">B3A</div>
     <div class="titles">
-      <p class="kicker">城巴 · 實時到站預報</p>
-      <h1>山景邨 ↔ 深圳灣口岸</h1>
+      <p class="kicker">
+        <span class="hat-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2.6 6.4 14.5c-.2.5.1 1 .7 1h9.8c.6 0 .9-.5.7-1L12 2.6Z" fill="currentColor"/>
+            <path d="M3.4 16.9c0-1 .8-1.8 1.8-1.8h13.6c1 0 1.8.8 1.8 1.8v.5c0 .5-.4.9-.9.9H4.3c-.5 0-.9-.4-.9-.9v-.5Z" fill="currentColor" opacity=".72"/>
+            <path d="M8.5 12.2h7" stroke="#061321" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </span>
+        城巴 · 實時到站預報
+      </p>
+      <h1>山景邨 ↔ <span class="nowrap">深圳灣口岸</span></h1>
     </div>
     <div class="live" id="live" data-status="ok" title="實時資料狀態">
       <span class="dot" aria-hidden="true"></span>
@@ -771,6 +835,9 @@
     </div>
 
     <div class="countdown">
+      <span class="spark s1" aria-hidden="true"></span>
+      <span class="spark s2" aria-hidden="true"></span>
+      <span class="spark s3" aria-hidden="true"></span>
       <span class="num idle" id="bigNum">—</span>
       <span class="unit" id="bigUnit">載入中</span>
     </div>
@@ -807,7 +874,7 @@
   <footer>
     <p>資料來源：城巴開放數據（data.gov.hk）</p>
     <p>非官方頁面 · 僅供參考 · 以現場站牌為準</p>
-    <p class="stamp">為 B3A 同學而設 · <span id="year"></span></p>
+    <p class="stamp">以水魔法驅動 · 為 B3A 同學而設 · <span id="year"></span></p>
   </footer>
 
 </main>
