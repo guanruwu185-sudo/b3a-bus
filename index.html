@@ -1,0 +1,1180 @@
+<!doctype html>
+<html lang="zh-Hant-HK">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>B3A 實時到站 · 山景邨 ↔ 深圳灣口岸</title>
+<meta name="description" content="城巴 B3A 實時到站預報。嶺南大學附近的富泰邨／富泰商場站，手機適用。">
+<meta name="theme-color" content="#070d18">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffb100'/%3E%3Ctext x='32' y='42' font-family='Arial,sans-serif' font-size='23' font-weight='700' text-anchor='middle' fill='%23070d18'%3EB3A%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg: #070d18;
+    --bg-soft: #0a1322;
+    --card: #101c31;
+    --card-hi: #15243d;
+    --line: rgba(255,255,255,.08);
+    --line-strong: rgba(255,255,255,.14);
+    --text: #f2f6ff;
+    --muted: #8ea2c0;
+    --muted-2: #7e93b3;
+    --amber: #ffb100;
+    --amber-2: #ffd257;
+    --amber-deep: #ff8a00;
+    --green: #3ddc84;
+    --red: #ff6b6b;
+    --radius: 22px;
+    --shadow: 0 24px 60px -28px rgba(0,0,0,.9);
+  }
+
+  *{ box-sizing: border-box; }
+  [hidden]{ display: none !important; }
+
+  html{ -webkit-text-size-adjust: 100%; }
+
+  body{
+    margin: 0;
+    min-height: 100svh;
+    background:
+      radial-gradient(120% 55% at 50% -8%, rgba(255,177,0,.12), transparent 62%),
+      radial-gradient(90% 45% at 105% 38%, rgba(45,110,220,.10), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    font-family: "PingFang HK", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body::before{
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--amber-deep), var(--amber-2), var(--amber-deep));
+    z-index: 20;
+  }
+
+  button, select{ font: inherit; }
+  button{ cursor: pointer; }
+
+  .wrap{
+    width: 100%;
+    max-width: 540px;
+    margin: 0 auto;
+    padding: max(22px, env(safe-area-inset-top)) 18px calc(34px + env(safe-area-inset-bottom));
+  }
+
+  /* ---------- header ---------- */
+  .top{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 2px 2px 0;
+  }
+
+  .route-badge{
+    flex: 0 0 auto;
+    width: 56px; height: 56px;
+    display: grid; place-items: center;
+    border-radius: 17px;
+    background: linear-gradient(160deg, #ffd257 0%, #ffb100 55%, #ff9500 100%);
+    color: #14100a;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+    box-shadow: 0 10px 26px -10px rgba(255,177,0,.65), inset 0 1px 0 rgba(255,255,255,.45);
+  }
+
+  .titles{ flex: 1; min-width: 0; }
+
+  .kicker{
+    margin: 0 0 3px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--amber-2);
+  }
+
+  h1{
+    margin: 0;
+    font-size: clamp(15px, 4.4vw, 19px);
+    font-weight: 750;
+    letter-spacing: -.01em;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .live{
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: .13em;
+    color: var(--green);
+    background: rgba(61,220,132,.10);
+    border: 1px solid rgba(61,220,132,.28);
+  }
+
+  .live .dot{
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2.2s ease-out infinite;
+  }
+
+  .live[data-status="stale"]{
+    color: var(--amber-2);
+    background: rgba(255,177,0,.10);
+    border-color: rgba(255,177,0,.30);
+  }
+
+  .live[data-status="error"]{
+    color: var(--red);
+    background: rgba(255,107,107,.10);
+    border-color: rgba(255,107,107,.30);
+  }
+
+  @keyframes pulse{
+    0%{ box-shadow: 0 0 0 0 rgba(61,220,132,.55); }
+    70%{ box-shadow: 0 0 0 7px rgba(61,220,132,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(61,220,132,0); }
+  }
+
+  /* ---------- direction tabs ---------- */
+  .tabs{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 22px;
+    padding: 6px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.035);
+    border: 1px solid var(--line);
+  }
+
+  .tabs button{
+    appearance: none;
+    border: 0;
+    border-radius: 13px;
+    padding: 10px 8px 9px;
+    background: transparent;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+    transition: color .18s ease, background .18s ease, transform .18s ease;
+  }
+
+  .tabs button:active{ transform: scale(.985); }
+
+  .tabs button[aria-selected="true"]{
+    background: linear-gradient(180deg, #ffc733, #ffb100);
+    color: #171104;
+    box-shadow: 0 10px 22px -12px rgba(255,177,0,.9), inset 0 1px 0 rgba(255,255,255,.4);
+  }
+
+  .tab-zh{ font-size: 14.5px; font-weight: 750; letter-spacing: -.01em; }
+  .tab-en{ font-size: 9.5px; font-weight: 600; letter-spacing: .05em; opacity: .78; }
+
+  /* ---------- stop picker ---------- */
+  .picker{
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 4px 15px 4px 17px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+
+  .picker-label{
+    flex: 0 0 auto;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: .16em;
+    color: var(--muted-2);
+    text-transform: uppercase;
+  }
+
+  .picker select{
+    flex: 1;
+    min-width: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 650;
+    padding: 12px 26px 12px 0;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+
+  .picker select:focus{ outline: none; }
+  .picker:focus-within{ border-color: rgba(255,177,0,.55); box-shadow: 0 0 0 3px rgba(255,177,0,.12); }
+  .picker option{ background: #0c1626; color: var(--text); }
+
+  .picker-chevron{
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    width: 8px; height: 8px;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+
+  /* ---------- alert ---------- */
+  .alert{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255,107,107,.09);
+    border: 1px solid rgba(255,107,107,.28);
+    color: #ffc9c9;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .alert span{ flex: 1; }
+
+  .alert button{
+    flex: 0 0 auto;
+    border: 1px solid rgba(255,107,107,.45);
+    background: transparent;
+    color: #ffd7d7;
+    border-radius: 9px;
+    padding: 6px 11px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* ---------- board ---------- */
+  .board{
+    position: relative;
+    margin-top: 12px;
+    padding: 21px 20px 14px;
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, rgba(23,38,63,.94), rgba(13,23,40,.96));
+    border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.06);
+    overflow: hidden;
+    scroll-margin-top: 16px;
+  }
+
+  .board::after{
+    content: "";
+    position: absolute;
+    top: -110px; right: -90px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(255,177,0,.14), transparent 68%);
+    pointer-events: none;
+  }
+
+  .board-head{
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .stop-head{ flex: 1; min-width: 0; }
+
+  .eyebrow{
+    margin: 0 0 7px;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: .17em;
+    color: var(--amber-2);
+    text-transform: uppercase;
+  }
+
+  h2{
+    margin: 0;
+    font-size: 23px;
+    font-weight: 780;
+    letter-spacing: -.02em;
+    line-height: 1.25;
+  }
+
+  .near{
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    vertical-align: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    color: var(--amber-2);
+    background: rgba(255,177,0,.12);
+    border: 1px solid rgba(255,177,0,.30);
+  }
+
+  .stop-sub{
+    margin: 4px 0 0;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .refresh{
+    flex: 0 0 auto;
+    width: 40px; height: 40px;
+    display: grid; place-items: center;
+    border-radius: 12px;
+    border: 1px solid var(--line-strong);
+    background: rgba(255,255,255,.045);
+    color: var(--muted);
+    transition: color .18s ease, border-color .18s ease, transform .18s ease;
+  }
+
+  .refresh:hover{ color: var(--text); border-color: rgba(255,177,0,.45); }
+  .refresh:active{ transform: scale(.94); }
+  .refresh svg{ width: 18px; height: 18px; }
+  .refresh.is-loading svg{ animation: spin .9s linear infinite; }
+  .refresh.is-loading{ color: var(--amber-2); border-color: rgba(255,177,0,.4); }
+
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  .countdown{
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+    min-height: 74px;
+  }
+
+  .num{
+    font-size: clamp(66px, 19vw, 92px);
+    font-weight: 800;
+    line-height: .86;
+    letter-spacing: -.055em;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(180deg, #ffe6a1 0%, #ffc02e 52%, #ff9200 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 26px rgba(255,177,0,.20));
+  }
+
+  .num.soon{
+    font-size: clamp(38px, 11.5vw, 54px);
+    letter-spacing: -.03em;
+    line-height: 1.15;
+    padding-bottom: 5px;
+  }
+
+  .num.idle{
+    font-size: clamp(56px, 16vw, 78px);
+    background: linear-gradient(180deg, #6f84a4, #4e6484);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: none;
+  }
+
+  .unit{
+    padding-bottom: 8px;
+    font-size: 17px;
+    font-weight: 750;
+    letter-spacing: .02em;
+    color: var(--amber-2);
+  }
+
+  .num.soon + .unit{ padding-bottom: 10px; }
+  .num.idle + .unit{ color: var(--muted); }
+
+  .arrival{
+    margin: 10px 0 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .eta-list{
+    position: relative;
+    list-style: none;
+    margin: 17px 0 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .eta-list li{
+    display: grid;
+    grid-template-columns: 26px 58px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .eta-list li:last-child{ border-bottom: 0; padding-bottom: 4px; }
+
+  .eta-list .idx{
+    display: grid;
+    place-items: center;
+    width: 22px; height: 22px;
+    border-radius: 7px;
+    background: rgba(255,255,255,.055);
+    color: var(--muted);
+    font-size: 10.5px;
+    font-weight: 800;
+  }
+
+  .eta-list li:first-child .idx{
+    background: rgba(255,177,0,.14);
+    color: var(--amber-2);
+  }
+
+  .eta-time{
+    font-size: 15.5px;
+    font-weight: 750;
+    letter-spacing: .01em;
+  }
+
+  .eta-rel{
+    min-width: 0;
+    font-size: 13px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .eta-tag{
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 9.5px;
+    font-weight: 750;
+    letter-spacing: .04em;
+    color: var(--muted);
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--line);
+    white-space: nowrap;
+  }
+
+  .eta-list li:first-child .eta-tag{
+    color: #171104;
+    background: var(--amber-2);
+    border-color: transparent;
+  }
+
+  .eta-list .empty-row{
+    display: block;
+    padding: 18px 0 8px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    border-bottom: 0;
+  }
+
+  .board-foot{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    font-size: 10.5px;
+    color: var(--muted-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .auto{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    letter-spacing: .08em;
+    white-space: nowrap;
+  }
+
+  .auto-dot{
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--amber);
+  }
+
+  /* ---------- stops ---------- */
+  .stops{
+    margin-top: 12px;
+    border-radius: 18px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .stops summary{
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 18px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .stops summary::-webkit-details-marker{ display: none; }
+
+  .summary-title{ font-size: 14px; font-weight: 700; }
+  .summary-count{ flex: 1; font-size: 11.5px; color: var(--muted); }
+
+  .summary-chevron{
+    width: 16px; height: 16px;
+    color: var(--muted);
+    transition: transform .2s ease;
+  }
+
+  .stops[open] .summary-chevron{ transform: rotate(180deg); }
+
+  .stop-list{
+    list-style: none;
+    margin: 0;
+    padding: 0 10px 12px;
+  }
+
+  .stop-item{
+    display: flex;
+    align-items: stretch;
+    gap: 11px;
+    width: 100%;
+    padding: 9px 9px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    transition: background .15s ease;
+  }
+
+  .stop-item:hover{ background: rgba(255,255,255,.04); }
+
+  .stop-item.is-selected{
+    background: rgba(255,177,0,.10);
+    box-shadow: inset 3px 0 0 var(--amber);
+  }
+
+  .stop-marker{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 17px;
+    padding-top: 4px;
+  }
+
+  .stop-marker .node{
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--muted-2);
+    border: 2px solid var(--card);
+    box-shadow: 0 0 0 1px var(--muted-2);
+    flex: 0 0 auto;
+  }
+
+  .stop-item.is-selected .node{
+    background: var(--amber);
+    box-shadow: 0 0 0 1px var(--amber), 0 0 12px rgba(255,177,0,.55);
+  }
+
+  .stop-marker::after{
+    content: "";
+    flex: 1;
+    width: 1px;
+    margin-top: 5px;
+    background: var(--line-strong);
+  }
+
+  .stop-item:last-child .stop-marker::after{ display: none; }
+
+  .stop-text{ flex: 1; min-width: 0; }
+
+  .stop-name{
+    display: block;
+    font-size: 13.5px;
+    font-weight: 650;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stop-en{
+    display: block;
+    margin-top: 1px;
+    font-size: 10.5px;
+    line-height: 1.35;
+    color: var(--muted-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stop-here{
+    flex: 0 0 auto;
+    align-self: center;
+    font-size: 9px;
+    font-weight: 750;
+    letter-spacing: .06em;
+    color: var(--amber-2);
+    border: 1px solid rgba(255,177,0,.35);
+    border-radius: 999px;
+    padding: 3px 6px;
+  }
+
+  /* ---------- info / footer ---------- */
+  .info{
+    margin-top: 18px;
+    padding: 18px 18px 16px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.025);
+    border: 1px solid var(--line);
+  }
+
+  .info h3{
+    margin: 0 0 10px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .info ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 9px;
+  }
+
+  .info li{
+    position: relative;
+    padding-left: 14px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .info li::before{
+    content: "";
+    position: absolute;
+    left: 0; top: .62em;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--amber);
+    opacity: .8;
+  }
+
+  .info strong{ color: var(--text); font-weight: 650; }
+
+  footer{
+    margin-top: 24px;
+    padding: 0 4px;
+    text-align: center;
+    font-size: 10.5px;
+    line-height: 1.7;
+    color: var(--muted-2);
+  }
+
+  footer p{ margin: 0; }
+  footer .stamp{ margin-top: 8px; color: var(--muted-2); opacity: .8; }
+
+  /* ---------- desktop ---------- */
+  @media (min-width: 640px){
+    .wrap{ padding-top: 44px; }
+    .board{ padding: 26px 26px 16px; }
+    .num{ font-size: 100px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <header class="top">
+    <div class="route-badge" aria-hidden="true">B3A</div>
+    <div class="titles">
+      <p class="kicker">城巴 · 實時到站預報</p>
+      <h1>山景邨 ↔ 深圳灣口岸</h1>
+    </div>
+    <div class="live" id="live" data-status="ok" title="實時資料狀態">
+      <span class="dot" aria-hidden="true"></span>
+      <span id="liveText">LIVE</span>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="行車方向">
+    <button type="button" role="tab" aria-selected="true" data-dir="O">
+      <span class="tab-zh">往深圳灣口岸</span>
+      <span class="tab-en">To Shenzhen Bay Port</span>
+    </button>
+    <button type="button" role="tab" aria-selected="false" data-dir="I">
+      <span class="tab-zh">往山景邨</span>
+      <span class="tab-en">To Shan King Estate</span>
+    </button>
+  </div>
+
+  <label class="picker" for="stopSelect">
+    <span class="picker-label">車站</span>
+    <select id="stopSelect" aria-label="選擇車站"></select>
+    <span class="picker-chevron" aria-hidden="true"></span>
+  </label>
+
+  <div class="alert" id="alert" hidden role="status">
+    <span id="alertText">未能取得實時資料。</span>
+    <button type="button" id="retry">重試</button>
+  </div>
+
+  <section class="board" id="board" aria-label="實時到站時間">
+    <div class="board-head">
+      <div class="stop-head">
+        <p class="eyebrow">下一班 · Next bus</p>
+        <h2 id="stopName">富泰邨</h2>
+        <p class="stop-sub" id="stopSub">青山公路 · Fu Tai Estate</p>
+      </div>
+      <button class="refresh" id="refresh" type="button" aria-label="重新整理到站時間">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
+          <path d="M21 3v6h-6"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="countdown">
+      <span class="num idle" id="bigNum">—</span>
+      <span class="unit" id="bigUnit">載入中</span>
+    </div>
+    <p class="arrival" id="bigClock">正在取得班次…</p>
+
+    <ul class="eta-list" id="etaList" aria-live="polite"></ul>
+
+    <div class="board-foot">
+      <span id="updated">正在連線…</span>
+      <span class="auto"><span class="auto-dot" aria-hidden="true"></span>AUTO 30s</span>
+    </div>
+  </section>
+
+  <details class="stops" id="stopsPanel">
+    <summary>
+      <span class="summary-title">沿途車站</span>
+      <span class="summary-count" id="stopCount">15 站</span>
+      <svg class="summary-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m6 9 6 6 6-6"/>
+      </svg>
+    </summary>
+    <ol class="stop-list" id="stopList"></ol>
+  </details>
+
+  <section class="info" aria-label="乘車提示">
+    <h3>乘車提示</h3>
+    <ul>
+      <li><strong>禁區範圍</strong>　深圳灣口岸屬禁區，須持有效旅行證件或許可證。</li>
+      <li><strong>天氣安排</strong>　強風時深圳灣公路大橋可能封閉，B3A 或暫停服務。</li>
+      <li><strong>車費參考</strong>　全程 $16.5；富泰上車往深圳灣 $13.6，以城巴公布為準。</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>資料來源：城巴開放數據（data.gov.hk）</p>
+    <p>非官方頁面 · 僅供參考 · 以現場站牌為準</p>
+    <p class="stamp">為 B3A 同學而設 · <span id="year"></span></p>
+  </footer>
+
+</main>
+
+<script>
+(() => {
+  'use strict';
+
+  const API = 'https://rt.data.gov.hk/v2/transport/citybus';
+  const ROUTE = 'B3A';
+  const REFRESH_MS = 30000;
+
+  /* Stop lists from the Citybus open-data route-stop endpoint.
+     "near" marks the stops closest to Lingnan University. */
+  const STOPS = {
+    O: [
+      { id: '003201', tc: '山景邨景麗樓, 石排頭路', en: 'King Lai House Shan King Estate, Shek Pai Tau Road' },
+      { id: '003202', tc: '大興變電站, 石排頭路', en: 'Tai Hing Substation, Shek Pai Tau Road' },
+      { id: '003203', tc: '台山商會小學, 石排頭路', en: 'Toi Shan Association Primary School, Shek Pai Tau Road' },
+      { id: '003204', tc: '大興體育館, 震寰路', en: 'Tai Hing Sports Centre, Tsun Wen Road' },
+      { id: '003256', tc: '大興北休憩處, 青田路', en: 'Tai Hing North Sitting-out Area, Tsing Tin Road' },
+      { id: '003257', tc: '新圍苑, 田景路', en: 'San Wai Court, Tin King Road' },
+      { id: '003258', tc: '兆邦苑, 田景路', en: 'Siu Pong Court, Tin King Road' },
+      { id: '003259', tc: '寶田邨, 鳴琴路', en: 'Po Tin Estate, Ming Kum Road' },
+      { id: '003752', tc: '和田邨', en: 'Wo Tin Estate' },
+      { id: '003753', tc: 'NOVO LAND, 欣寶路', en: 'NOVO LAND, Yan Po Road' },
+      { id: '003754', tc: '紫田村, 欣寶路', en: 'Tsz Tin Tsuen, Yan Po Road' },
+      { id: '003207', tc: '欣田邨, 青麟路', en: 'Yan Tin Estate, Tsing Lun Road' },
+      { id: '003350', tc: '五柳路, 藍地交匯處', en: 'Ng Lau Road, Lam Tei Interchange' },
+      { id: '003261', tc: '富泰邨, 青山公路', en: 'Fu Tai Estate, Castle Peak Road', near: '嶺南大學' },
+      { id: '003208', tc: '深圳灣口岸', en: 'Shenzhen Bay Port' }
+    ],
+    I: [
+      { id: '003208', tc: '深圳灣口岸', en: 'Shenzhen Bay Port' },
+      { id: '003262', tc: '富泰商場, 青山公路', en: 'Fu Tai Shopping Centre, Castle Peak Road', near: '嶺南大學' },
+      { id: '003351', tc: '五柳路, 藍地交匯處', en: 'Ng Lau Road, Lam Tei Interchange' },
+      { id: '003209', tc: '欣田邨, 青麟路', en: 'Yan Tin Estate, Tsing Lun Road' },
+      { id: '004004', tc: '菁田邨', en: 'Ching Tin Estate' },
+      { id: '003767', tc: 'NOVO LAND, 欣寶路', en: 'NOVO LAND, Yan Po Road' },
+      { id: '003752', tc: '和田邨', en: 'Wo Tin Estate' },
+      { id: '003264', tc: '盈豐園, 鳴琴路', en: 'Goodrich Garden, Ming Kum Road' },
+      { id: '003265', tc: '良景邨, 田景路', en: 'Leung King Estate, Tin King Road' },
+      { id: '003266', tc: '田景邨田裕樓, 田景路', en: 'Tin Yue House Tin King Estate, Tin King Road' },
+      { id: '003267', tc: '建生邨樂生樓, 青田路', en: 'Lok Sang House Kin Sang Estate, Tsing Tin Road' },
+      { id: '003213', tc: '大興體育館, 震寰路', en: 'Tai Hing Sports Centre, Tsun Wen Road' },
+      { id: '003214', tc: '翠林花園, 石排頭路', en: 'Greenland Garden, Shek Pai Tau Road' },
+      { id: '003201', tc: '山景邨景麗樓, 石排頭路', en: 'King Lai House Shan King Estate, Shek Pai Tau Road' }
+    ]
+  };
+
+  const DEFAULTS = { O: '003261', I: '003262' };
+
+  const $ = (id) => document.getElementById(id);
+  const el = {
+    live: $('live'),
+    liveText: $('liveText'),
+    select: $('stopSelect'),
+    alert: $('alert'),
+    alertText: $('alertText'),
+    retry: $('retry'),
+    board: $('board'),
+    stopName: $('stopName'),
+    stopSub: $('stopSub'),
+    refresh: $('refresh'),
+    bigNum: $('bigNum'),
+    bigUnit: $('bigUnit'),
+    bigClock: $('bigClock'),
+    etaList: $('etaList'),
+    updated: $('updated'),
+    stopCount: $('stopCount'),
+    stopList: $('stopList'),
+    year: $('year')
+  };
+
+  const state = {
+    dir: 'O',
+    stop: DEFAULTS.O,
+    lastStop: { ...DEFAULTS },
+    etas: [],
+    updatedAt: null,
+    loading: false,
+    error: null,
+    request: 0
+  };
+
+  const timeFmt = new Intl.DateTimeFormat('zh-HK', {
+    hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Hong_Kong'
+  });
+  const timeSecFmt = new Intl.DateTimeFormat('zh-HK', {
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Hong_Kong'
+  });
+
+  const formatTime = (ts, withSeconds = false) =>
+    (withSeconds ? timeSecFmt : timeFmt).format(new Date(ts));
+
+  const splitName = (name) => {
+    const i = name.indexOf(', ');
+    return i === -1 ? [name, ''] : [name.slice(0, i), name.slice(i + 2)];
+  };
+
+  const currentStop = () => STOPS[state.dir].find((s) => s.id === state.stop) || STOPS[state.dir][0];
+
+  const findStop = (dir, id) => STOPS[dir].find((s) => s.id === id);
+
+  function minutesUntil(ts) {
+    return Math.max(0, Math.round((ts - Date.now()) / 60000));
+  }
+
+  function relLabel(ts) {
+    const mins = minutesUntil(ts);
+    if (mins <= 0) return '即將到站';
+    if (mins < 60) return mins + ' 分鐘';
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return m ? h + ' 小時 ' + m + ' 分' : h + ' 小時';
+  }
+
+  function setDirection(dir) {
+    if (dir !== 'O' && dir !== 'I') return;
+    if (state.dir === dir && state.stop) return;
+
+    state.dir = dir;
+    state.stop = state.lastStop[dir] || DEFAULTS[dir];
+    state.etas = [];
+    state.updatedAt = null;
+    state.error = null;
+
+    document.querySelectorAll('.tabs button').forEach((btn) => {
+      btn.setAttribute('aria-selected', String(btn.dataset.dir === dir));
+    });
+
+    el.select.innerHTML = STOPS[dir]
+      .map((s) => '<option value="' + s.id + '">' + s.tc + (s.near ? '（近嶺大）' : '') + '</option>')
+      .join('');
+    el.select.value = state.stop;
+
+    el.stopCount.textContent = STOPS[dir].length + ' 站';
+    renderStopList();
+    renderBoard();
+    fetchEta();
+  }
+
+  function chooseStop(id, scroll = false) {
+    if (!findStop(state.dir, id) || id === state.stop) return;
+
+    state.stop = id;
+    state.lastStop[state.dir] = id;
+    state.etas = [];
+    state.updatedAt = null;
+    state.error = null;
+    el.select.value = id;
+
+    renderStopList();
+    renderBoard();
+    fetchEta();
+
+    if (scroll) {
+      el.board.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function renderStopList() {
+    const selected = state.stop;
+    el.stopList.innerHTML = STOPS[state.dir].map((s) => {
+      const isSelected = s.id === selected;
+      const [tcMain, tcRoad] = splitName(s.tc);
+      return '<li>' +
+        '<button type="button" class="stop-item' + (isSelected ? ' is-selected' : '') + '" data-stop="' + s.id + '"' +
+        (isSelected ? ' aria-current="true"' : '') + '>' +
+          '<span class="stop-marker" aria-hidden="true"><span class="node"></span></span>' +
+          '<span class="stop-text">' +
+            '<span class="stop-name">' + s.tc + '</span>' +
+            '<span class="stop-en">' + s.en + '</span>' +
+          '</span>' +
+          (s.near ? '<span class="stop-here">近嶺大</span>' : '') +
+        '</button>' +
+      '</li>';
+    }).join('');
+  }
+
+  function renderBoard() {
+    const stop = currentStop();
+    const [tcMain, tcRoad] = splitName(stop.tc);
+    const [enMain] = splitName(stop.en);
+
+    el.stopName.textContent = tcMain;
+    const nearBadge = el.stopName.querySelector('.near');
+    if (stop.near) {
+      if (nearBadge) {
+        nearBadge.textContent = '近' + stop.near;
+      } else {
+        const span = document.createElement('span');
+        span.className = 'near';
+        span.textContent = '近' + stop.near;
+        el.stopName.appendChild(span);
+      }
+    } else if (nearBadge) {
+      nearBadge.remove();
+    }
+
+    const subParts = [];
+    if (tcRoad) subParts.push(tcRoad);
+    if (enMain) subParts.push(enMain);
+    el.stopSub.textContent = subParts.join(' · ');
+
+    const now = Date.now();
+    const upcoming = state.etas.filter((x) => x.t > now - 30000);
+    const next = upcoming[0];
+    const hasData = state.updatedAt !== null;
+
+    if (!hasData && state.loading) {
+      el.bigNum.textContent = '…';
+      el.bigNum.className = 'num idle';
+      el.bigUnit.textContent = '載入中';
+      el.bigClock.textContent = '正在取得班次…';
+    } else if (next) {
+      const mins = minutesUntil(next.t);
+      if (mins <= 0) {
+        el.bigNum.textContent = '即將';
+        el.bigNum.className = 'num soon';
+        el.bigUnit.textContent = '到站';
+      } else {
+        el.bigNum.textContent = String(mins);
+        el.bigNum.className = 'num';
+        el.bigUnit.textContent = '分鐘';
+      }
+      el.bigClock.textContent = formatTime(next.t) + ' 到站';
+    } else if (state.error) {
+      el.bigNum.textContent = '—';
+      el.bigNum.className = 'num idle';
+      el.bigUnit.textContent = '暫時離線';
+      el.bigClock.textContent = '請按右上角重新整理';
+    } else {
+      el.bigNum.textContent = '—';
+      el.bigNum.className = 'num idle';
+      el.bigUnit.textContent = '暫無班次';
+      el.bigClock.textContent = '請稍後再試或查看站牌';
+    }
+
+    if (upcoming.length) {
+      const tags = ['下一班', '第二班', '第三班'];
+      el.etaList.innerHTML = upcoming.slice(0, 3).map((x, i) => {
+        const remark = x.remark ? ' · ' + x.remark : '';
+        return '<li>' +
+          '<span class="idx">' + (i + 1) + '</span>' +
+          '<span class="eta-time">' + formatTime(x.t) + '</span>' +
+          '<span class="eta-rel">' + relLabel(x.t) + remark + '</span>' +
+          '<span class="eta-tag">' + tags[i] + '</span>' +
+        '</li>';
+      }).join('');
+    } else {
+      el.etaList.innerHTML = '<li class="empty-row">' +
+        (state.error ? '暫時無法取得班次資料' : '暫時沒有預定班次') + '</li>';
+    }
+
+    el.alert.hidden = !state.error;
+    if (state.error) {
+      el.alertText.textContent = hasData
+        ? '連線失敗，顯示較早前資料。'
+        : '未能取得實時資料，請檢查網絡後重試。';
+    }
+
+    el.refresh.classList.toggle('is-loading', state.loading);
+
+    const age = state.updatedAt ? Date.now() - state.updatedAt.getTime() : Infinity;
+    const status = state.error ? 'error' : (age > 90000 ? 'stale' : 'ok');
+    el.live.dataset.status = status;
+    el.liveText.textContent = state.loading ? '更新中' : state.error ? '離線' : 'LIVE';
+
+    el.updated.textContent = state.updatedAt
+      ? '更新於 ' + formatTime(state.updatedAt.getTime(), true)
+      : '正在連線…';
+  }
+
+  async function fetchEta() {
+    const requestId = ++state.request;
+    const dir = state.dir;
+    const stop = state.stop;
+
+    state.loading = true;
+    state.error = null;
+    renderBoard();
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10000);
+
+    try {
+      const res = await fetch(
+        API + '/eta/CTB/' + encodeURIComponent(stop) + '/' + ROUTE,
+        { signal: controller.signal, cache: 'no-store' }
+      );
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      const json = await res.json();
+      if (requestId !== state.request) return;
+
+      const now = Date.now();
+      const seen = new Set();
+      const list = (Array.isArray(json.data) ? json.data : [])
+        .filter((x) => x.dir === dir && x.eta)
+        .map((x) => ({
+          t: new Date(x.eta).getTime(),
+          remark: x.rmk_tc || x.rmk_en || ''
+        }))
+        .filter((x) => Number.isFinite(x.t) && x.t > now - 60000)
+        .filter((x) => {
+          const key = Math.round(x.t / 30000);
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .sort((a, b) => a.t - b.t);
+
+      state.etas = list;
+      state.updatedAt = new Date();
+      state.error = null;
+    } catch (err) {
+      if (requestId !== state.request) return;
+      state.error = err && err.name === 'AbortError' ? '連線逾時' : '未能取得資料';
+    } finally {
+      clearTimeout(timer);
+      if (requestId === state.request) {
+        state.loading = false;
+        renderBoard();
+      }
+    }
+  }
+
+  /* ---------- wire up ---------- */
+  document.querySelectorAll('.tabs button').forEach((btn) => {
+    btn.addEventListener('click', () => setDirection(btn.dataset.dir));
+  });
+
+  el.select.addEventListener('change', (e) => chooseStop(e.target.value));
+
+  el.stopList.addEventListener('click', (e) => {
+    const btn = e.target.closest('.stop-item');
+    if (btn) chooseStop(btn.dataset.stop, true);
+  });
+
+  el.refresh.addEventListener('click', () => fetchEta());
+  el.retry.addEventListener('click', () => fetchEta());
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) fetchEta();
+  });
+
+  el.year.textContent = new Date().getFullYear();
+
+  /* hydrate default stop list before the first paint of options */
+  el.select.innerHTML = STOPS[state.dir]
+    .map((s) => '<option value="' + s.id + '">' + s.tc + (s.near ? '（近嶺大）' : '') + '</option>')
+    .join('');
+  el.select.value = state.stop;
+  el.stopCount.textContent = STOPS[state.dir].length + ' 站';
+
+  renderStopList();
+  renderBoard();
+  fetchEta();
+
+  setInterval(() => {
+    if (!document.hidden) fetchEta();
+  }, REFRESH_MS);
+
+  /* refresh the countdown every 10s without another network call */
+  setInterval(renderBoard, 10000);
+})();
+</script>
+</body>
+</html>
