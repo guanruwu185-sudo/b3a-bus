@@ -296,21 +296,6 @@
 
   .board > *{ position: relative; z-index: 1; }
 
-  .board > .board-hat{
-    position: absolute;
-    left: -14px;
-    bottom: -8px;
-    width: 120px;
-    height: 120px;
-    z-index: 0;
-    color: var(--accent);
-    opacity: .08;
-    transform: rotate(-12deg);
-    pointer-events: none;
-  }
-
-  .board-hat svg{ display: block; width: 100%; height: 100%; }
-
   .board::before{
     content: "";
     position: absolute;
@@ -760,56 +745,6 @@
 
   .info strong{ color: var(--text); font-weight: 650; }
 
-  /* ---------- mascot card ---------- */
-  .mascot{
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 18px;
-    padding: 18px 16px 14px;
-    border-radius: 20px;
-    background:
-      radial-gradient(90% 120% at 8% 100%, rgba(94,200,255,.14), transparent 60%),
-      linear-gradient(180deg, rgba(18,34,61,.92), rgba(10,20,38,.94));
-    border: 1px solid var(--line);
-    overflow: hidden;
-  }
-
-  .mascot::after{
-    content: "";
-    position: absolute;
-    right: -30px; top: -40px;
-    width: 150px; height: 150px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(154,134,255,.13), transparent 68%);
-    pointer-events: none;
-  }
-
-  .mascot-art{
-    position: relative;
-    z-index: 1;
-    flex: 0 0 118px;
-    align-self: flex-end;
-    margin-bottom: -10px;
-    filter: drop-shadow(0 12px 18px rgba(0,0,0,.35));
-  }
-
-  .mascot-art svg{ display: block; width: 100%; height: auto; }
-
-  .mascot-copy{
-    position: relative;
-    z-index: 1;
-    flex: 1;
-    min-width: 0;
-    padding-bottom: 4px;
-  }
-
-  .mascot-copy .eyebrow{ margin-bottom: 6px; font-size: 9px; letter-spacing: .13em; }
-  .mascot-copy h3{ margin: 0 0 6px; font-size: 16px; font-weight: 750; letter-spacing: -.01em; }
-  .mascot-copy p{ margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--muted); }
-  .mascot-copy .hint{ display: inline-block; margin-top: 8px; font-size: 10.5px; color: var(--muted-2); }
-
   footer{
     margin-top: 24px;
     padding: 0 4px;
@@ -827,12 +762,6 @@
     .wrap{ padding-top: 44px; }
     .board{ padding: 26px 26px 16px; }
     .num{ font-size: 100px; }
-  }
-
-  @media (max-width: 350px){
-    .mascot{ gap: 4px; padding: 16px 14px 12px; }
-    .mascot-art{ flex-basis: 100px; }
-    .mascot-copy h3{ font-size: 15px; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -891,14 +820,6 @@
   </div>
 
   <section class="board" id="board" aria-label="實時到站時間">
-    <span class="board-hat" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M12 2.6 6.4 14.5c-.2.5.1 1 .7 1h9.8c.6 0 .9-.5.7-1L12 2.6Z" fill="currentColor"/>
-        <path d="M3.4 16.9c0-1 .8-1.8 1.8-1.8h13.6c1 0 1.8.8 1.8 1.8v.5c0 .5-.4.9-.9.9H4.3c-.5 0-.9-.4-.9-.9v-.5Z" fill="currentColor" opacity=".7"/>
-        <path d="M8.5 12.2h7" stroke="#050914" stroke-width="1.3" stroke-linecap="round"/>
-      </svg>
-    </span>
-
     <div class="board-head">
       <div class="stop-head">
         <p class="eyebrow">下一班 · Next bus</p>
@@ -948,88 +869,6 @@
       <li><strong>天氣安排</strong>　強風時深圳灣公路大橋可能封閉，B3A 或暫停服務。</li>
       <li><strong>車費參考</strong>　全程 $16.5；富泰上車往深圳灣 $13.6，以城巴公布為準。</li>
     </ul>
-  </section>
-
-  <section class="mascot" aria-labelledby="mascotTitle">
-    <div class="mascot-art" aria-hidden="true">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240">
-        <defs>
-          <linearGradient id="mHair" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#b6ecff"/>
-            <stop offset=".45" stop-color="#6fd2ff"/>
-            <stop offset="1" stop-color="#5b7cff"/>
-          </linearGradient>
-          <linearGradient id="mHat" x1="0" y1="0" x2=".2" y2="1">
-            <stop offset="0" stop-color="#7d8dff"/>
-            <stop offset="1" stop-color="#2b3f86"/>
-          </linearGradient>
-          <linearGradient id="mCloak" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#2c447c"/>
-            <stop offset="1" stop-color="#141f3d"/>
-          </linearGradient>
-          <radialGradient id="mOrb" cx=".35" cy=".3" r=".75">
-            <stop offset="0" stop-color="#ffffff"/>
-            <stop offset=".35" stop-color="#bdeaff"/>
-            <stop offset="1" stop-color="#5e9cff"/>
-          </radialGradient>
-        </defs>
-
-        <circle cx="176" cy="55" r="34" fill="#5ec8ff" opacity=".12"/>
-        <circle cx="176" cy="55" r="25" fill="#5ec8ff" opacity=".10"/>
-
-        <path d="M176 214 176 72" stroke="#8b6b4d" stroke-width="8" stroke-linecap="round"/>
-        <path d="M176 214 176 72" stroke="#c09a70" stroke-width="2" stroke-linecap="round" opacity=".55"/>
-        <circle cx="176" cy="55" r="15" fill="url(#mOrb)"/>
-        <circle cx="176" cy="55" r="19" fill="none" stroke="#bdeaff" stroke-width="1.2" opacity=".55"/>
-        <path d="m176 36 2.2 5.8 5.8 2.2-5.8 2.2L176 52l-2.2-5.8L168 44l5.8-2.2L176 36Z" fill="#e0f7ff" opacity=".95"/>
-
-        <path d="M68 110c0-30 18-52 44-52s44 22 44 52c0 28-7 52-11 74-3 19-9 30-20 30-9 0-13-13-13-27h-4c0 14-4 27-13 27-11 0-17-11-20-30-4-22-11-46-11-74Z" fill="url(#mHair)"/>
-        <path d="M76 122c-2 22 1 44 5 62M146 122c2 22-1 44-5 62" stroke="#9ae1ff" stroke-width="3" stroke-linecap="round" opacity=".5" fill="none"/>
-
-        <path d="M82 162c10-8 46-8 56 0l10 48c1 6-3 10-9 10H81c-6 0-10-4-9-10l10-48Z" fill="url(#mCloak)"/>
-        <path d="M82 166c12 8 44 8 56 0" stroke="#8b7bff" stroke-width="5" stroke-linecap="round" fill="none"/>
-        <path d="M86 176c-8 5-11 12-10 19" stroke="#ffe0d2" stroke-width="9" stroke-linecap="round" fill="none"/>
-        <path d="M136 174c10 4 18 10 24 17" stroke="#ffe0d2" stroke-width="9" stroke-linecap="round" fill="none"/>
-        <circle cx="166" cy="193" r="7" fill="#ffe0d2"/>
-        <path d="M92 220v7M130 220v7" stroke="#101a30" stroke-width="12" stroke-linecap="round"/>
-        <path d="M82 206c14 5 42 5 56 0" stroke="#8b7bff" stroke-width="2" stroke-linecap="round" fill="none" opacity=".45"/>
-        <circle cx="110" cy="166" r="3.2" fill="#bdeaff"/>
-
-        <rect x="102" y="146" width="16" height="18" rx="8" fill="#f5c8b8"/>
-        <circle cx="110" cy="112" r="42" fill="#ffe0d2"/>
-        <circle cx="68" cy="114" r="6" fill="#ffd0bd"/>
-        <circle cx="152" cy="114" r="6" fill="#ffd0bd"/>
-
-        <path d="M68 105c4-33 20-45 42-45s38 12 42 45c-8-10-18-13-26-13-6 10-12 15-18 16-4-10-8-14-12-16-6 4-16 8-28 13Z" fill="url(#mHair)"/>
-        <path d="M68 108c-4 18-2 34 4 48 2-16 1-32-4-48ZM152 108c4 18 2 34-4 48-2-16-1-32 4-48Z" fill="url(#mHair)"/>
-
-        <ellipse cx="110" cy="74" rx="62" ry="15" fill="#3a4f92"/>
-        <path d="M72 74 106 18c2-3 6-3 8 0l34 56H72Z" fill="url(#mHat)"/>
-        <path d="M72 74c0-4 17-7 38-7s38 3 38 7-17 7-38 7-38-3-38-7Z" fill="#8b7bff"/>
-        <path d="M76 74c0-3 15-5 34-5s34 2 34 5" fill="none" stroke="#bdeaff" stroke-width="2" opacity=".8"/>
-        <path d="m132 36 2.2 6.2 6.2 2.2-6.2 2.2L132 53l-2.2-6.4-6.2-2.2 6.2-2.2L132 36Z" fill="#bdeaff"/>
-
-        <ellipse cx="94" cy="116" rx="7" ry="9" fill="#1a2a52"/>
-        <ellipse cx="126" cy="116" rx="7" ry="9" fill="#1a2a52"/>
-        <circle cx="92" cy="113" r="2.6" fill="#fff"/>
-        <circle cx="124" cy="113" r="2.6" fill="#fff"/>
-        <circle cx="96.5" cy="119" r="1.2" fill="#5ec8ff"/>
-        <circle cx="128.5" cy="119" r="1.2" fill="#5ec8ff"/>
-        <ellipse cx="84" cy="128" rx="6" ry="3.5" fill="#ff9fb0" opacity=".55"/>
-        <ellipse cx="136" cy="128" rx="6" ry="3.5" fill="#ff9fb0" opacity=".55"/>
-        <path d="M105 130c3 3 7 3 10 0" stroke="#c96a78" stroke-width="2" stroke-linecap="round" fill="none"/>
-
-        <path d="M46 92c5 8 8 12 8 16a8 8 0 0 1-16 0c0-4 3-8 8-16Z" fill="#5ec8ff" opacity=".5"/>
-        <path d="M196 134c4 6 6 9 6 12a6 6 0 0 1-12 0c0-3 2-6 6-12Z" fill="#8b7bff" opacity=".45"/>
-        <path d="M62 198c3 5 5 7 5 9a5 5 0 0 1-10 0c0-2 2-4 5-9Z" fill="#bdeaff" opacity=".45"/>
-      </svg>
-    </div>
-    <div class="mascot-copy">
-      <p class="eyebrow">水魔法使 · Roxy-inspired</p>
-      <h3 id="mascotTitle">等車也要有魔法</h3>
-      <p>藍髮、尖帽與水魔法，陪你看住下一班 B3A。</p>
-      <span class="hint">原創插畫 · 非官方角色圖</span>
-    </div>
   </section>
 
   <footer>
